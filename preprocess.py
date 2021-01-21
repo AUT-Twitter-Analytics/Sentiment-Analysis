@@ -44,7 +44,7 @@ class Preprocess:
         stemmer = PorterStemmer()
         lemmatizer = WordNetLemmatizer()
         stopwords = set(stopwords.words("english"))
-        alphabet = set(list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+        alphabet = set(list("abcdefghijklmnopqrstuvwxyz"))
 
         data.text = data.apply(
             lambda row: self.stemLemmaStopWord(
@@ -89,7 +89,8 @@ class Preprocess:
     def en_normalize(self, text):
         text = text.replace(to_replace=r"@([A-Za-z0-9_]+)", value="", regex=True)
         text = text.replace(to_replace=r"http([^\s\\]+)", value="", regex=True)
-        text = text.replace(to_replace=r"[^A-Za-z]", value=" ", regex=True)
+        text = text.str.lower()
+        text = text.replace(to_replace=r"[^a-z]", value=" ", regex=True)
         text = text.replace(to_replace=r"(.)\1+", value=r"\1", regex=True)
         text = text.replace(to_replace=r"[^\S\n\t]+", value=" ", regex=True)
         return text
