@@ -1,5 +1,3 @@
-# !pip install hazm
-
 import re, hazm, nltk
 import pandas as pd
 from nltk.corpus import stopwords
@@ -11,24 +9,14 @@ nltk.download("stopwords")
 
 
 class Preprocess:
-    def __init__(self, data):
-        is_fa = data["language"] == "fa"
+    def fit(self, data):
+        is_fa = data["lang"] == "fa"
         fa_data = data[is_fa]
-        fa_data = self.clean_fa(fa_data)
+        self.fa_data = self.clean_fa(fa_data)
 
-        is_en = data["language"] == "en"
+        is_en = data["lang"] == "en"
         en_data = data[is_en]
-        en_data = self.clean_en(en_data)
-
-        # merge
-        frames = [en_data, fa_data]
-        data = pd.concat(frames)
-
-        # shuffle data
-        data = data.sample(frac=1)
-        data.reset_index(drop=True, inplace=True)
-
-        return data
+        self.en_data = self.clean_en(en_data)
 
     def clean_fa(self, data):
         data.text = self.fa_normalize(data.text)
@@ -37,7 +25,7 @@ class Preprocess:
         stemmer = hazm.Stemmer()
         lemmatizer = hazm.Lemmatizer()
         stopwords = hazm.stopwords_list()
-        alphabet = set(list("آابپتثجچحخدذرزژسشصضطظعغفقکگلم‌ن‌وهی"))
+        alphabet = set(list("ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهی"))
 
         data.text = data.apply(
             lambda row: self.stemLemmaStopWord(
@@ -90,7 +78,7 @@ class Preprocess:
         text = text.replace(to_replace=r"[ة]", value="ه", regex=True)
         text = text.replace(to_replace=r"[إأآا]", value="ا", regex=True)
         text = text.replace(
-            to_replace=r"[^آابپتثجچحخدذرزژسشصضطظعغفقکگلم‌ن‌وهی]", value=" ", regex=True
+            to_replace=r"[^ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهی]", value=" ", regex=True
         )
         text = text.replace(to_replace=r"(.)\1+", value=r"\1", regex=True)
         text = text.replace(to_replace=r"[^\S\n\t]+", value=" ", regex=True)
