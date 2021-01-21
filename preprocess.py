@@ -14,11 +14,21 @@ class Preprocess:
     def __init__(self, data):
         is_fa = data["language"] == "fa"
         fa_data = data[is_fa]
-        self.fa_data = self.clean_fa(fa_data)
+        fa_data = self.clean_fa(fa_data)
 
         is_en = data["language"] == "en"
         en_data = data[is_en]
-        self.en_data = self.clean_en(en_data)
+        en_data = self.clean_en(en_data)
+
+        # merge
+        frames = [en_data, fa_data]
+        data = pd.concat(frames)
+
+        # shuffle data
+        data = data.sample(frac=1)
+        data.reset_index(drop=True, inplace=True)
+
+        return data
 
     def clean_fa(self, data):
         data.text = self.fa_normalize(data.text)
